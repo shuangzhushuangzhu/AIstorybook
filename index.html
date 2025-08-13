@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="theme-color" content="#F8E6C9" />
+    <title>AI 绘本工坊 · Demo</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <script src="config.js"></script>
+    <main id="app">
+      <!-- Landing / Prompt Screen -->
+      <section class="panel panel-entry" id="panel-entry" aria-labelledby="title">
+        <h1 id="title">AI 绘本工坊</h1>
+        <div class="input-block">
+          <input id="topic-input" type="text" inputmode="text" placeholder="请输入故事主题或关键字…" autocomplete="off" />
+        </div>
+
+        <ul class="suggest-list" aria-label="示例主题">
+          <li data-topic="小猫去太空探险"><span class="dot">🎨</span>小猫去太空探险</li>
+          <li data-topic="森林里的宝藏"><span class="dot">🧭</span>森林里的宝藏</li>
+          <li data-topic="海盗船冒险"><span class="dot">🏴‍☠️</span>海盗船冒险</li>
+          <li data-topic="住在树上的女孩"><span class="dot">🌳</span>住在树上的女孩</li>
+        </ul>
+
+        <button class="primary" id="btn-generate" aria-label="生成绘本">生成绘本</button>
+        <p class="tip">连接火山引擎 AI 生成真实绘本内容。</p>
+      </section>
+
+      <!-- Storybook Viewer -->
+      <section class="panel panel-viewer" id="panel-viewer" hidden>
+        <header class="viewer-bar">
+          <button class="ghost" id="btn-back" aria-label="返回">← 返回</button>
+          <div class="progress" aria-live="polite"><span id="progress-label">1 / 1</span></div>
+          <div class="spacer"></div>
+        </header>
+
+        <div id="stage" class="stage" aria-live="polite"></div>
+
+        <footer class="nav">
+          <button class="ghost" id="btn-prev" aria-label="上一页">上一页</button>
+          <button class="primary" id="btn-next" aria-label="下一页">下一页</button>
+        </footer>
+      </section>
+
+      <!-- Toast -->
+      <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+  </html>
+
+
+
