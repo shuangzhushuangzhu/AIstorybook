@@ -9,16 +9,17 @@
   const btnBack = '#btn-back';
   const btnPrev = '#btn-prev';
   const btnNext = '#btn-next';
+  const btnTtsSel = '#btn-tts';
   const stageSel = '#stage';
   const progressSel = '#progress-label';
   const toastSel = '#toast';
 
-  let entry, viewer, topicInput, generateBtn, backBtn, prevBtn, nextBtn, stage, progressLabel, toast;
+  let entry, viewer, topicInput, generateBtn, backBtn, prevBtn, nextBtn, btnTts, stage, progressLabel, toast;
 
   function cache() {
     entry = $(entryPanel); viewer = $(viewerPanel);
     topicInput = $(input); generateBtn = $(btnGenerate);
-    backBtn = $(btnBack); prevBtn = $(btnPrev); nextBtn = $(btnNext);
+    backBtn = $(btnBack); prevBtn = $(btnPrev); nextBtn = $(btnNext); btnTts = $(btnTtsSel);
     stage = $(stageSel); progressLabel = $(progressSel); toast = $(toastSel);
   }
 
@@ -115,6 +116,7 @@
 
     currentIndex = index;
     updateProgress();
+    stopTtsIfSpeaking();
   }
 
   function next() {
@@ -126,6 +128,36 @@
     goTo(currentIndex + 1);
   }
   function prev() { goTo(currentIndex - 1); }
+
+  // --- TTS ---
+  let ttsUtterance = null;
+  function speak(text) {
+    if (!('speechSynthesis' in window)) {
+      showToast('当前浏览器不支持朗读');
+      return;
+    }
+    stopTtsIfSpeaking();
+    ttsUtterance = new SpeechSynthesisUtterance(text);
+    ttsUtterance.lang = 'zh-CN';
+    ttsUtterance.rate = 1.0;
+    ttsUtterance.pitch = 1.0;
+    ttsUtterance.onend = () => setTtsPressed(false);
+    window.speechSynthesis.speak(ttsUtterance);
+    setTtsPressed(true);
+  }
+  function stopTtsIfSpeaking() {
+    try {
+      if ('speechSynthesis' in window && window.speechSynthesis.speaking) {
+        window.speechSynthesis.cancel();
+      }
+    } catch {}
+    setTtsPressed(false);
+  }
+  function setTtsPressed(isPressed) {
+    if (!btnTts) return;
+    btnTts.setAttribute('aria-pressed', String(isPressed));
+    btnTts.textContent = isPressed ? '⏹' : '🔊';
+  }
 
   function bindGestures() {
     let startX = 0, startY = 0, deltaX = 0, isTouching = false;
@@ -298,6 +330,16 @@
     backBtn.addEventListener('click', () => switchPanel(false));
     prevBtn.addEventListener('click', prev);
     nextBtn.addEventListener('click', next);
+    btnTts.addEventListener('click', () => {
+      const currentPage = stage.querySelector('.page.current .caption');
+      const text = currentPage ? currentPage.textContent.trim() : '';
+      if (!text) return;
+      if (window.speechSynthesis && window.speechSynthesis.speaking) {
+        stopTtsIfSpeaking();
+      } else {
+        speak(text);
+      }
+    });
   }
 
   function generateCaption(topic, idx) {
